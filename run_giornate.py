@@ -5,7 +5,8 @@ def simulate_multiple_giornate(
     rounds_per_day: int,
     starting_balance: int,
     base_bet: int,
-    insane: bool
+    insane: bool,
+    profit_target_pct: float
 ) -> None:
     win_days = 0
     loss_days = 0
@@ -17,7 +18,8 @@ def simulate_multiple_giornate(
             starting_balance=starting_balance,
             base_bet=base_bet,
             max_rounds=rounds_per_day,
-            insane=insane
+            insane=insane,
+            profit_target_pct=profit_target_pct
         )
         final_balance = balance_history[-1]
         if final_balance > starting_balance:
@@ -33,7 +35,7 @@ def simulate_multiple_giornate(
     avg_loss_balance = sum(loss_balances) / len(loss_balances) if loss_balances else 0
 
     print("\n=== Giornata Simulation ===")
-    print(f"Total days simulated: {days} with {starting_balance}€ starting balance")
+    print(f"Total days simulated: {days} with {starting_balance}€ starting balance and {profit_target_pct}% profit target")
     print(f"Winning days: {win_days} ({win_rate:.2f}%)")
     print(f"Losing days: {loss_days} ({loss_rate:.2f}%)")
     print(f"Average final balance on winning days: {avg_win_balance:.2f}€")
@@ -45,5 +47,6 @@ if __name__ == "__main__":
         rounds_per_day=100,
         starting_balance=1200,
         base_bet=5,
-        insane=True
+        insane=True,
+        profit_target_pct=34.0
     )

@@ -23,7 +23,8 @@ def simulate_roulette_fibonacci(
     starting_balance: int = 1200,
     base_bet: int = 5,
     max_rounds: int = 10000,
-    insane: bool = False
+    insane: bool = True,
+    profit_target_pct: float = 0.0
 ) -> Tuple[List[int], List[Tuple[int, int]]]:
     fib = fibonacci_sequence()
     fib_stack: List[int] = [next(fib)]
@@ -86,6 +87,15 @@ def simulate_roulette_fibonacci(
         balance_over_time.append(balance)
         round_counter += 1
 
+        # Stopper: exit early if profit target reached
+        if profit_target_pct > 0:
+            target_balance = starting_balance * (1 + profit_target_pct / 100)
+            if balance >= target_balance:
+                logger.info(
+                    f"\n--- Profit target reached ({profit_target_pct}% → {target_balance:.2f}€). Stopping. ---"
+                )
+                break
+
     # Final stats
     logger.info("\n=== Final Stats ===")
     logger.info(f"Final balance: {balance}")
@@ -97,6 +107,7 @@ def simulate_roulette_fibonacci(
     logger.info(f"Max Fibonacci depth reached: {max_fib_depth}")
 
     return balance_over_time, loss_game_points
+
 
 def plot_balance(balance_history: List[int], loss_game_points: List[Tuple[int, int]]) -> None:
     plt.figure(figsize=(10, 6))
