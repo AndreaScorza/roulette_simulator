@@ -20,9 +20,9 @@ def fibonacci_sequence() -> Generator[int, None, None]:
         fib.append(fib[-1] + fib[-2])
 
 def simulate_roulette_fibonacci(
-    starting_balance: int = 500,
+    starting_balance: int = 1200,
     base_bet: int = 5,
-    max_rounds: int = 1000,
+    max_rounds: int = 10000,
     insane: bool = False
 ) -> Tuple[List[int], List[Tuple[int, int]]]:
     fib = fibonacci_sequence()
