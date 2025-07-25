@@ -1,5 +1,6 @@
 import random
 import logging
+import matplotlib.pyplot as plt
 from typing import Generator, List
 
 MIN_BET = 5
@@ -22,7 +23,7 @@ def simulate_roulette_fibonacci(
     starting_balance: int = 1000,
     base_bet: int = 5,
     max_rounds: int = 1000
-) -> None:
+) -> List[int]:
     fib = fibonacci_sequence()
     fib_stack: List[int] = [next(fib)]
     balance: int = starting_balance
@@ -32,6 +33,7 @@ def simulate_roulette_fibonacci(
     game_count = 0
     max_bet_made = 0
     max_fib_depth = 1
+    balance_over_time: List[int] = [balance]
 
     while balance > 0 and round_counter < max_rounds:
         fib_number = fib_stack[-1]
@@ -70,6 +72,7 @@ def simulate_roulette_fibonacci(
             f"Balance = {balance}"
         )
 
+        balance_over_time.append(balance)
         round_counter += 1
 
     # Final stats
@@ -82,8 +85,21 @@ def simulate_roulette_fibonacci(
     logger.info(f"Max bet made: {max_bet_made}")
     logger.info(f"Max Fibonacci depth reached: {max_fib_depth}")
 
+    return balance_over_time
+
+def plot_balance(balance_history: List[int]) -> None:
+    plt.figure()
+    plt.plot(range(len(balance_history)), balance_history)
+    plt.xlabel("Round")
+    plt.ylabel("Balance (€)")
+    plt.title("Balance Over Time")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
 def main() -> None:
-    simulate_roulette_fibonacci()
+    balance_history = simulate_roulette_fibonacci()
+    plot_balance(balance_history)
 
 if __name__ == "__main__":
     main()
