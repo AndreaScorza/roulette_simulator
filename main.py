@@ -20,7 +20,7 @@ def fibonacci_sequence() -> Generator[int, None, None]:
         fib.append(fib[-1] + fib[-2])
 
 def simulate_roulette_fibonacci(
-    starting_balance: int = 1000,
+    starting_balance: int = 500,
     base_bet: int = 5,
     max_rounds: int = 1000
 ) -> List[int]:
@@ -88,14 +88,39 @@ def simulate_roulette_fibonacci(
     return balance_over_time
 
 def plot_balance(balance_history: List[int]) -> None:
-    plt.figure()
-    plt.plot(range(len(balance_history)), balance_history)
-    plt.xlabel("Round")
-    plt.ylabel("Balance (€)")
-    plt.title("Balance Over Time")
-    plt.grid(True)
+    plt.figure(figsize=(10, 6))
+    rounds = range(len(balance_history))
+    
+    # Main balance line
+    plt.plot(rounds, balance_history, linewidth=2, label="Balance")
+
+    # Reference values
+    starting = balance_history[0]
+    maximum = max(balance_history)
+    minimum = min(balance_history)
+
+    # Reference lines
+    plt.axhline(starting, color='gray', linestyle=':', linewidth=1, label=f"Start ({starting}€)")
+    plt.axhline(maximum, color='green', linestyle='--', linewidth=1, label=f"Max ({maximum}€)")
+    plt.axhline(minimum, color='red', linestyle='--', linewidth=1, label=f"Min ({minimum}€)")
+    plt.axhline(0, color='black', linestyle='-', linewidth=1, label="Zero (€0)")
+
+    # Force y-axis to include zero
+    ymin = min(0, minimum)
+    ymax = max(maximum, starting)
+    plt.ylim(ymin - 10, ymax + 10)
+
+    # Formatting
+    plt.xlabel("Round", fontsize=12)
+    plt.ylabel("Balance (€)", fontsize=12)
+    plt.title("Roulette Balance Over Time (Fibonacci Strategy)", fontsize=14)
+    plt.grid(True, which='both', linestyle='--', alpha=0.4)
+    plt.minorticks_on()
+    plt.legend()
     plt.tight_layout()
     plt.show()
+
+
 
 def main() -> None:
     balance_history = simulate_roulette_fibonacci()
