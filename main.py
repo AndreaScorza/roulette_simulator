@@ -1,7 +1,7 @@
 import random
 import logging
 import matplotlib.pyplot as plt
-from typing import Generator, List
+from typing import Generator, List, Tuple
 
 MIN_BET = 5
 MAX_BET = 500
@@ -22,11 +22,12 @@ def fibonacci_sequence() -> Generator[int, None, None]:
 def simulate_roulette_fibonacci(
     starting_balance: int = 500,
     base_bet: int = 5,
-    max_rounds: int = 1000
-) -> List[int]:
+    max_rounds: int = 1000,
+    insane: bool = False
+) -> Tuple[List[int], List[Tuple[int, int]]]:
     fib = fibonacci_sequence()
     fib_stack: List[int] = [next(fib)]
-    balance: int = starting_balance
+    balance = starting_balance
     round_counter = 0
     win_count = 0
     loss_count = 0
@@ -34,6 +35,7 @@ def simulate_roulette_fibonacci(
     max_bet_made = 0
     max_fib_depth = 1
     balance_over_time: List[int] = [balance]
+    loss_game_points: List[Tuple[int, int]] = []
 
     while balance > 0 and round_counter < max_rounds:
         fib_number = fib_stack[-1]
@@ -42,8 +44,17 @@ def simulate_roulette_fibonacci(
         if bet_amount < MIN_BET:
             bet_amount = MIN_BET
         elif bet_amount > MAX_BET or bet_amount > balance:
-            logger.info("\n--- Simulation Stopped ---")
-            break
+            loss_game_points.append((round_counter, balance))
+            if insane:
+                logger.info(
+                    f"\n--- Max bet ({bet_amount}€) exceeded. Resetting sequence (Insane mode ON) ---"
+                )
+                fib = fibonacci_sequence()
+                fib_stack = [next(fib)]
+                continue
+            else:
+                logger.info("\n--- Simulation Stopped ---")
+                break
 
         max_bet_made = max(max_bet_made, bet_amount)
         max_fib_depth = max(max_fib_depth, len(fib_stack))
@@ -85,14 +96,19 @@ def simulate_roulette_fibonacci(
     logger.info(f"Max bet made: {max_bet_made}")
     logger.info(f"Max Fibonacci depth reached: {max_fib_depth}")
 
-    return balance_over_time
+    return balance_over_time, loss_game_points
 
-def plot_balance(balance_history: List[int]) -> None:
+def plot_balance(balance_history: List[int], loss_game_points: List[Tuple[int, int]]) -> None:
     plt.figure(figsize=(10, 6))
     rounds = range(len(balance_history))
     
     # Main balance line
     plt.plot(rounds, balance_history, linewidth=2, label="Balance")
+
+    # Red dots for game-ending losses
+    if loss_game_points:
+        x, y = zip(*loss_game_points)
+        plt.scatter(x, y, color='red', label="Game Loss", zorder=5)
 
     # Reference values
     starting = balance_history[0]
@@ -120,11 +136,9 @@ def plot_balance(balance_history: List[int]) -> None:
     plt.tight_layout()
     plt.show()
 
-
-
 def main() -> None:
-    balance_history = simulate_roulette_fibonacci()
-    plot_balance(balance_history)
+    balance_history, loss_game_points = simulate_roulette_fibonacci(insane=True)
+    plot_balance(balance_history, loss_game_points)
 
 if __name__ == "__main__":
     main()
