@@ -20,7 +20,7 @@ def fibonacci_sequence() -> Generator[int, None, None]:
 
 def simulate_roulette_fibonacci(
     starting_balance: int = 1000,
-    base_bet: int = 10,
+    base_bet: int = 5,
     max_rounds: int = 1000
 ) -> None:
     fib = fibonacci_sequence()
