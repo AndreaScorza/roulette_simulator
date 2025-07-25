@@ -22,36 +22,48 @@ def simulate_roulette_fibonacci(
     starting_balance: int = 1000,
     base_bet: int = 10,
     max_rounds: int = 1000
-) -> int:
+) -> None:
     fib = fibonacci_sequence()
     fib_stack: List[int] = [next(fib)]
     balance: int = starting_balance
-    round_counter: int = 0
+    round_counter = 0
+    win_count = 0
+    loss_count = 0
+    game_count = 0
+    max_bet_made = 0
+    max_fib_depth = 1
 
     while balance > 0 and round_counter < max_rounds:
         fib_number = fib_stack[-1]
-        bet_amount: int = fib_number * base_bet
+        bet_amount = fib_number * base_bet
 
         if bet_amount < MIN_BET:
             bet_amount = MIN_BET
         elif bet_amount > MAX_BET or bet_amount > balance:
+            logger.info("\n--- Simulation Stopped ---")
             break
 
+        max_bet_made = max(max_bet_made, bet_amount)
+        max_fib_depth = max(max_fib_depth, len(fib_stack))
+
         balance -= bet_amount
-        result: int = random.randint(0, 36)
-        win: bool = 25 <= result <= 36
+        result = random.randint(0, 36)
+        win = 25 <= result <= 36
 
         if win:
             balance += bet_amount * 3
             outcome = "WIN"
+            win_count += 1
+            game_count += 1
             fib = fibonacci_sequence()
             fib_stack = [next(fib)]
         else:
             outcome = "LOSS"
+            loss_count += 1
             fib_stack.append(next(fib))
 
         logger.info(
-            f"Round {round_counter + 1}: "
+            f"Game {game_count + 1} - Round {round_counter + 1}: "
             f"Bet = {bet_amount}, "
             f"Fibonacci = {fib_number}, "
             f"Outcome = {outcome}, "
@@ -60,11 +72,18 @@ def simulate_roulette_fibonacci(
 
         round_counter += 1
 
-    return balance
+    # Final stats
+    logger.info("\n=== Final Stats ===")
+    logger.info(f"Final balance: {balance}")
+    logger.info(f"Total rounds played: {round_counter}")
+    logger.info(f"Total wins: {win_count}")
+    logger.info(f"Total losses: {loss_count}")
+    logger.info(f"Total games (full sequences): {game_count}")
+    logger.info(f"Max bet made: {max_bet_made}")
+    logger.info(f"Max Fibonacci depth reached: {max_fib_depth}")
 
 def main() -> None:
-    final_balance = simulate_roulette_fibonacci()
-    logger.info(f"Final balance: {final_balance}")
+    simulate_roulette_fibonacci()
 
 if __name__ == "__main__":
     main()
